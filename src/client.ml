@@ -24,12 +24,15 @@ module Make(Conn:Make.Conn)(Elem:Make.Elem) = struct
   let put ?key ?v ?(ops=[Put_return_head true; Put_if_none_match true]) x ts = Conn.with_connection (fun conn ->
     match_lwt riak_put_raw conn Elem.bucket key ~links:(links ts) (Elem.to_string x) ops v with
       | Some { obj_key = Some key; obj_vclock = Some vclock } ->
-          Printf.printf "%s - case 1 - Some { obj_key = Some key; obj_vclock = Some vclock }\n" key;
           return { key = key; value = x; vclock = vclock; links = ts }
+      | Some { obj_vclock = Some vclock; obj_value = Some rv } ->
+        (match key with
+          | Some key ->
+            return { key = key; value = (Elem.of_string rv); vclock = vclock; links = ts }
+          | None -> raise Not_found)
       | Some { obj_vclock = Some vclock } ->
         (match key with
           | Some key ->
-            Printf.printf "%s - case 2 - Some { obj_vclock = Some vclock }\n" key;
             return { key = key; value = x; vclock = vclock; links = ts }
           | None -> raise Not_found)
       | _ -> raise Not_found
