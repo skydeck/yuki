@@ -1,6 +1,7 @@
 open Lwt
 open Riak
 open Riak_kv_piqi
+open Printf
 
 module Make(Conn:Make.Conn)(Elem:Make.Elem) = struct
   type t = {
@@ -49,12 +50,17 @@ module Make(Conn:Make.Conn)(Elem:Make.Elem) = struct
   let write_default key empty fn =
     try_lwt
       lwt { value = x; vclock = v } = get key in
+      Printf.printf "[curr_head: %s]" (Elem.to_string x);
       lwt x' = fn x in
+      Printf.printf "[new_head: %s]" (Elem.to_string x');
       lwt _ = put ~key ~v ~ops:[Put_return_head true] x' [] in
+      Printf.printf "write_default done";
       return ()
     with Not_found ->
       lwt x = fn empty in
+      Printf.printf "[new_head: %s]" (Elem.to_string x);
       lwt _ = put ~key x [] in
+      Printf.printf "write_default done";
       return ()
 
   let write' key fn =
