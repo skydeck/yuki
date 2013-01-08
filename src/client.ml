@@ -28,7 +28,8 @@ module Make(Conn:Make.Conn)(Elem:Make.Elem) = struct
       | Some { obj_vclock = Some vclock; obj_value = Some rv } ->
         (match key with
           | Some key ->
-            return { key = key; value = (Elem.of_string rv); vclock = vclock; links = ts }
+            Printf.printf "->>>>>>>>>>>>>>>>>>> return value is '%s'" rv;
+            return { key = key; value = x; vclock = vclock; links = ts }
           | None -> raise Not_found)
       | Some { obj_vclock = Some vclock } ->
         (match key with
@@ -60,7 +61,7 @@ module Make(Conn:Make.Conn)(Elem:Make.Elem) = struct
       Printf.printf "[curr_head: %s]\n" (Elem.to_string x);
       lwt x' = fn x in
       Printf.printf "[new_head: %s]\n" (Elem.to_string x');
-      lwt { value = y; vclock = v' } = put ~key ~v ~ops:[Put_return_body true; Put_w Riak_value_quorum] x' [] in
+      lwt { value = y; vclock = v' } = put ~key ~v ~ops:[Put_return_head true; Put_return_body true; Put_w Riak_value_quorum] x' [] in
       Printf.printf "write_default done. result: %s\n" (Elem.to_string y);
       return ()
     with Not_found ->
