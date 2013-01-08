@@ -50,17 +50,17 @@ module Make(Conn:Make.Conn)(Elem:Make.Elem) = struct
   let write_default key empty fn =
     try_lwt
       lwt { value = x; vclock = v } = get key in
-      Printf.printf "[curr_head: %s]" (Elem.to_string x);
+      Printf.printf "[curr_head: %s]\n" (Elem.to_string x);
       lwt x' = fn x in
-      Printf.printf "[new_head: %s]" (Elem.to_string x');
-      lwt _ = put ~key ~v ~ops:[Put_return_head true] x' [] in
-      Printf.printf "write_default done";
+      Printf.printf "[new_head: %s]\n" (Elem.to_string x');
+      lwt { value = y; vclock = v' } = put ~key ~v ~ops:[Put_return_body true; Put_w Riak_value_quorum] x' [] in
+      Printf.printf "write_default done. result: %s\n" (Elem.to_string y);
       return ()
     with Not_found ->
       lwt x = fn empty in
-      Printf.printf "[new_head: %s]" (Elem.to_string x);
+      Printf.printf "[new_head: %s]\n" (Elem.to_string x);
       lwt _ = put ~key x [] in
-      Printf.printf "write_default done";
+      Printf.printf "write_default done\n";
       return ()
 
   let write' key fn =
