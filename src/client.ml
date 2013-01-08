@@ -23,7 +23,7 @@ module Make(Conn:Make.Conn)(Elem:Make.Elem) = struct
   let get key = Conn.with_connection (get_conn key)
 
   let put_conn ?key ?v ?(ops=[Put_return_head true; Put_if_none_match true]) x ts conn =
-    match_lwt riak_put_raw conn Elem.bucket key ~links:(links ts) (Elem.to_string x) ops v with
+    match_lwt riak_put conn Elem.bucket key ~links:(links ts) (Elem.to_string x) ops with
       | Some { obj_key = Some key; obj_vclock = Some vclock } ->
           return { key = key; value = x; vclock = vclock; links = ts }
       | Some { obj_vclock = Some vclock; obj_value = Some rv } ->
