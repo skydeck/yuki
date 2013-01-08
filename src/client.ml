@@ -61,8 +61,8 @@ module Make(Conn:Make.Conn)(Elem:Make.Elem) = struct
       Printf.printf "[curr_head: %s]\n" (Elem.to_string x);
       lwt x' = fn x in
       Printf.printf "[new_head: %s]\n" (Elem.to_string x');
-      lwt { value = y; vclock = v' } = put ~key ~v ~ops:[Put_return_body true] x' [] in
-      Printf.printf "write_default done. result: %s\n" (Elem.to_string y);
+      lwt { value = y; vclock = v' } = put ~key ~ops:[Put_return_body true] x' [] in
+      Printf.printf "write_default done. result: %s, old_vclock: %s, new_vclock: %s\n" (Elem.to_string y) v v';
       return ()
     with Not_found ->
       lwt x = fn empty in
