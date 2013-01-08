@@ -10,9 +10,7 @@ module RandomAccessList(Conn:Make.Conn)(Elem:Make.Elem) = struct
     let bucket = Elem.bucket
   end)
 
-  let init () =
-    lwt { Client.key } = Client.put Impl.empty [] in
-    return key
+  let init () = Client.put Impl.empty []
 
   let size head = Client.read head
     (Lwt_list.fold_left_s (fun a (w, _) -> return (a + w)) 0)
@@ -29,19 +27,17 @@ module RandomAccessList(Conn:Make.Conn)(Elem:Make.Elem) = struct
   let fold_right head f x = Client.read head (Impl.fold_right f x)
 end
 
-module Heap(Conn:Make.Conn)(Elem:Make.Ord) = struct
-  module Impl = Yuki_bootstrap.Make(Conn)(Elem)
-  module Client = Client.Make(Conn)(Impl.BootstrappedElem)
+(*module RedBlackTree(Conn:Make.Conn)(Elem:Make.Ord) = struct
+  module Impl = Yuki_rbtree.Make(Conn)(Elem)
+  module Client = Impl.Client
 
-  let init () =
-    lwt { Client.key } = Client.put Impl.empty [] in
-    return key
+  let size head = assert false
 
-  let insert head x = Client.write head (Impl.insert x)
+  let member head x = Client.read head (Impl.member x)
 
-  let find_min head = Client.read head Impl.find_min
-  let delete_min head = Client.write' head Impl.delete_min
-end
+  let insert head ?key x = Client.write head (Impl.insert ?key x)
+  let delete head x = Client.write head (Impl.delete x)
+end*)
 
 module Imperative = struct
   module RandomAccessList(Conn:Make.Conn)(Elem:Make.Elem) = struct
@@ -66,15 +62,5 @@ module Imperative = struct
 
     let fold_left head f x = Client.read_default head Impl.empty (Impl.fold_left f x)
     let fold_right head f x = Client.read_default head Impl.empty (Impl.fold_right f x)
-  end
-
-  module Heap(Conn:Make.Conn)(Elem:Make.Ord) = struct
-    module Impl = Yuki_bootstrap.Make(Conn)(Elem)
-    module Client = Client.Make(Conn)(Impl.BootstrappedElem)
-
-    let insert head x = Client.write_default head Impl.empty (Impl.insert x)
-
-    let find_min head = Client.read_default head Impl.empty Impl.find_min
-    let delete_min head = Client.write_default' head Impl.empty Impl.delete_min
   end
 end

@@ -17,15 +17,14 @@ module RandomAccessList(Conn:Make.Conn)(Elem:Make.Elem) : sig
   val fold_right : string -> (Elem.t -> 'a -> 'a Lwt.t) -> 'a -> 'a Lwt.t
 end
 
-module Heap(Conn:Make.Conn)(Elem:Make.Ord) : sig
-  val init : unit -> string Lwt.t
+(*module RedBlackTree(Conn:Make.Conn)(Elem:Make.Ord) : sig
+  val size : string -> int Lwt.t
 
-  val insert : string -> Elem.t -> string Lwt.t
+  val member : string -> Elem.t -> bool Lwt.t
 
-  val find_min : string -> Elem.t Lwt.t
-  val delete_min : string -> (Elem.t * string) Lwt.t
-  (* find_min and delete_min raise Empty if heap is empty *)
-end
+  val insert : string -> ?key:string -> Elem.t -> string Lwt.t
+  val delete : string -> unit Lwt.t
+end*)
 
 module Imperative : sig
   module RandomAccessList(Conn:Make.Conn)(Elem:Make.Elem) : sig
@@ -44,11 +43,11 @@ module Imperative : sig
     val fold_left : string -> ('a -> Elem.t -> 'a Lwt.t) -> 'a -> 'a Lwt.t
     val fold_right : string -> (Elem.t -> 'a -> 'a Lwt.t) -> 'a -> 'a Lwt.t
   end
-
-  module Heap(Conn:Make.Conn)(Elem:Make.Ord) : sig
-    val insert : string -> Elem.t -> unit Lwt.t
-
-    val find_min : string -> Elem.t Lwt.t
-    val delete_min : string -> Elem.t Lwt.t
-  end
 end
+
+
+
+
+
+
+

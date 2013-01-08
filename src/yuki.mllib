@@ -1,5 +1,5 @@
 # OASIS_START
-# DO NOT EDIT (digest: d0becaaafdabd5ee9d884feb9abfc088)
+# DO NOT EDIT (digest: cf78499ecfe48ec2efddcaf825765b67)
 Yuki
 Make
 Client
@@ -7,6 +7,4 @@ Yuki_t
 Yuki_j
 Yuki_rlist
 Yuki_rbtree
-Yuki_heap
-Yuki_bootstrap
 # OASIS_STOP
