@@ -31,18 +31,11 @@ module RandomAccessList(Conn:Make.Conn)(Elem:Make.Elem) = struct
   let map head f = Client.read head (Impl.map f)
 end
 
-module Heap(Conn:Make.Conn)(Elem:Make.Ord) = struct
-  module Impl = Yuki_bootstrap.Make(Conn)(Elem)
-  module Client = Client.Make(Conn)(Impl.BootstrappedElem)
+module FingerTree(Conn:Make.Conn)(Elem:Make.Elem) = struct
+  module Impl = Yuki_tree.Make(Conn)(Elem)
+  module Client = Impl.Client
 
-  let init () =
-    lwt { Client.key } = Client.put Impl.empty [] in
-    return key
-
-  let insert head x = Client.write head (Impl.insert x)
-
-  let find_min head = Client.read head Impl.find_min
-  let delete_min head = Client.write' head Impl.delete_min
+  let cons head ?key x = Client.write head (Impl.cons ?key x)
 end
 
 module Imperative = struct
@@ -70,15 +63,5 @@ module Imperative = struct
     let fold_right head f x = Client.read_default head Impl.empty (Impl.fold_right f x)
 
     let map head f = Client.read_default head Impl.empty (Impl.map f)
-  end
-
-  module Heap(Conn:Make.Conn)(Elem:Make.Ord) = struct
-    module Impl = Yuki_bootstrap.Make(Conn)(Elem)
-    module Client = Client.Make(Conn)(Impl.BootstrappedElem)
-
-    let insert head x = Client.write_default head Impl.empty (Impl.insert x)
-
-    let find_min head = Client.read_default head Impl.empty Impl.find_min
-    let delete_min head = Client.write_default' head Impl.empty Impl.delete_min
   end
 end

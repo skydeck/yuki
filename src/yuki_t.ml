@@ -3,8 +3,20 @@
 
 type rlist = (int * string) list
 
-type node = (int * string * string list)
+type node = [
+    `Node2 of (string * string * string)
+  | `Node3 of (string * string * string * string)
+]
 
-type heap = string list
+type digit = [
+    `One of (string * string)
+  | `Two of (string * string * string)
+  | `Three of (string * string * string * string)
+  | `Four of (string * string * string * string * string)
+]
 
-type bootstrap = [ `E | `H of (string * heap) ]
+type fg = [
+    `Nil
+  | `Single of string
+  | `Deep of (string * digit * string * digit)
+]

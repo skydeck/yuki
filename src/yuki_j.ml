@@ -5,9 +5,9 @@ type rlist = Yuki_t.rlist
 
 type node = Yuki_t.node
 
-type heap = Yuki_t.heap
+type digit = Yuki_t.digit
 
-type bootstrap = Yuki_t.bootstrap
+type fg = Yuki_t.fg
 
 let write__1 = (
   Ag_oj_run.write_list (
@@ -90,145 +90,71 @@ let read_rlist = (
 )
 let rlist_of_string s =
   read_rlist (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
-let write__2 = (
-  Ag_oj_run.write_list (
-    Yojson.Safe.write_string
-  )
-)
-let string_of__2 ?(len = 1024) x =
-  let ob = Bi_outbuf.create len in
-  write__2 ob x;
-  Bi_outbuf.contents ob
-let read__2 = (
-  Ag_oj_run.read_list (
-    Ag_oj_run.read_string
-  )
-)
-let _2_of_string s =
-  read__2 (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
 let write_node = (
   fun ob x ->
-    Bi_outbuf.add_char ob '(';
-    (let x, _, _ = x in
-    (
-      Yojson.Safe.write_int
-    ) ob x
-    );
-    Bi_outbuf.add_char ob ',';
-    (let _, x, _ = x in
-    (
-      Yojson.Safe.write_string
-    ) ob x
-    );
-    Bi_outbuf.add_char ob ',';
-    (let _, _, x = x in
-    (
-      write__2
-    ) ob x
-    );
-    Bi_outbuf.add_char ob ')';
-)
-let string_of_node ?(len = 1024) x =
-  let ob = Bi_outbuf.create len in
-  write_node ob x;
-  Bi_outbuf.contents ob
-let read_node = (
-  fun p lb ->
-    Yojson.Safe.read_space p lb;
-    let std_tuple = Yojson.Safe.start_any_tuple p lb in
-    let len = ref 0 in
-    let end_of_tuple = ref false in
-    (try
-      let x0 =
-        let x =
-          (
-            Ag_oj_run.read_int
-          ) p lb
-        in
-        incr len;
-        Yojson.Safe.read_space p lb;
-        Yojson.Safe.read_tuple_sep2 p std_tuple lb;
-        x
-      in
-      let x1 =
-        let x =
-          (
-            Ag_oj_run.read_string
-          ) p lb
-        in
-        incr len;
-        Yojson.Safe.read_space p lb;
-        Yojson.Safe.read_tuple_sep2 p std_tuple lb;
-        x
-      in
-      let x2 =
-        let x =
-          (
-            read__2
-          ) p lb
-        in
-        incr len;
-        (try
-          Yojson.Safe.read_space p lb;
-          Yojson.Safe.read_tuple_sep2 p std_tuple lb;
-        with Yojson.End_of_tuple -> end_of_tuple := true);
-        x
-      in
-      if not !end_of_tuple then (
-        try
-          while true do
-            Yojson.Safe.skip_json p lb;
-            Yojson.Safe.read_tuple_sep2 p std_tuple lb;
-          done
-        with Yojson.End_of_tuple -> ()
-      );
-      (x0, x1, x2)
-    with Yojson.End_of_tuple ->
-      Ag_oj_run.missing_tuple_fields !len [ 0; 1; 2 ]);
-)
-let node_of_string s =
-  read_node (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
-let write_heap = (
-  write__2
-)
-let string_of_heap ?(len = 1024) x =
-  let ob = Bi_outbuf.create len in
-  write_heap ob x;
-  Bi_outbuf.contents ob
-let read_heap = (
-  read__2
-)
-let heap_of_string s =
-  read_heap (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
-let write_bootstrap = (
-  fun ob x ->
     match x with
-      | `E -> Bi_outbuf.add_string ob "<\"E\">"
-      | `H x ->
-        Bi_outbuf.add_string ob "<\"H\":";
+      | `Node2 x ->
+        Bi_outbuf.add_string ob "<\"Node2\":";
         (
           fun ob x ->
             Bi_outbuf.add_char ob '(';
-            (let x, _ = x in
+            (let x, _, _ = x in
             (
               Yojson.Safe.write_string
             ) ob x
             );
             Bi_outbuf.add_char ob ',';
-            (let _, x = x in
+            (let _, x, _ = x in
             (
-              write_heap
+              Yojson.Safe.write_string
+            ) ob x
+            );
+            Bi_outbuf.add_char ob ',';
+            (let _, _, x = x in
+            (
+              Yojson.Safe.write_string
+            ) ob x
+            );
+            Bi_outbuf.add_char ob ')';
+        ) ob x;
+        Bi_outbuf.add_char ob '>'
+      | `Node3 x ->
+        Bi_outbuf.add_string ob "<\"Node3\":";
+        (
+          fun ob x ->
+            Bi_outbuf.add_char ob '(';
+            (let x, _, _, _ = x in
+            (
+              Yojson.Safe.write_string
+            ) ob x
+            );
+            Bi_outbuf.add_char ob ',';
+            (let _, x, _, _ = x in
+            (
+              Yojson.Safe.write_string
+            ) ob x
+            );
+            Bi_outbuf.add_char ob ',';
+            (let _, _, x, _ = x in
+            (
+              Yojson.Safe.write_string
+            ) ob x
+            );
+            Bi_outbuf.add_char ob ',';
+            (let _, _, _, x = x in
+            (
+              Yojson.Safe.write_string
             ) ob x
             );
             Bi_outbuf.add_char ob ')';
         ) ob x;
         Bi_outbuf.add_char ob '>'
 )
-let string_of_bootstrap ?(len = 1024) x =
+let string_of_node ?(len = 1024) x =
   let ob = Bi_outbuf.create len in
-  write_bootstrap ob x;
+  write_node ob x;
   Bi_outbuf.contents ob
-let read_bootstrap = (
+let read_node = (
   fun p lb ->
     Yojson.Safe.read_space p lb;
     match Yojson.Safe.start_any_variant p lb with
@@ -239,12 +165,12 @@ let read_bootstrap = (
               if pos < 0 || len < 0 || pos + len > String.length s then
                 invalid_arg "out-of-bounds substring position or length";
               try
-                if len = 1 then (
-                  match String.unsafe_get s pos with
-                    | 'E' -> (
+                if len = 5 && String.unsafe_get s pos = 'N' && String.unsafe_get s (pos+1) = 'o' && String.unsafe_get s (pos+2) = 'd' && String.unsafe_get s (pos+3) = 'e' then (
+                  match String.unsafe_get s (pos+4) with
+                    | '2' -> (
                         0
                       )
-                    | 'H' -> (
+                    | '3' -> (
                         1
                       )
                     | _ -> (
@@ -261,9 +187,65 @@ let read_bootstrap = (
           let i = Yojson.Safe.map_ident p f lb in
           match i with
             | 0 ->
+              Ag_oj_run.read_until_field_value p lb;
+              let x = (
+                  fun p lb ->
+                    Yojson.Safe.read_space p lb;
+                    let std_tuple = Yojson.Safe.start_any_tuple p lb in
+                    let len = ref 0 in
+                    let end_of_tuple = ref false in
+                    (try
+                      let x0 =
+                        let x =
+                          (
+                            Ag_oj_run.read_string
+                          ) p lb
+                        in
+                        incr len;
+                        Yojson.Safe.read_space p lb;
+                        Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                        x
+                      in
+                      let x1 =
+                        let x =
+                          (
+                            Ag_oj_run.read_string
+                          ) p lb
+                        in
+                        incr len;
+                        Yojson.Safe.read_space p lb;
+                        Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                        x
+                      in
+                      let x2 =
+                        let x =
+                          (
+                            Ag_oj_run.read_string
+                          ) p lb
+                        in
+                        incr len;
+                        (try
+                          Yojson.Safe.read_space p lb;
+                          Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                        with Yojson.End_of_tuple -> end_of_tuple := true);
+                        x
+                      in
+                      if not !end_of_tuple then (
+                        try
+                          while true do
+                            Yojson.Safe.skip_json p lb;
+                            Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                          done
+                        with Yojson.End_of_tuple -> ()
+                      );
+                      (x0, x1, x2)
+                    with Yojson.End_of_tuple ->
+                      Ag_oj_run.missing_tuple_fields !len [ 0; 1; 2 ]);
+                ) p lb
+              in
               Yojson.Safe.read_space p lb;
               Yojson.Safe.read_gt p lb;
-              `E
+              `Node2 x
             | 1 ->
               Ag_oj_run.read_until_field_value p lb;
               let x = (
@@ -287,7 +269,29 @@ let read_bootstrap = (
                       let x1 =
                         let x =
                           (
-                            read_heap
+                            Ag_oj_run.read_string
+                          ) p lb
+                        in
+                        incr len;
+                        Yojson.Safe.read_space p lb;
+                        Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                        x
+                      in
+                      let x2 =
+                        let x =
+                          (
+                            Ag_oj_run.read_string
+                          ) p lb
+                        in
+                        incr len;
+                        Yojson.Safe.read_space p lb;
+                        Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                        x
+                      in
+                      let x3 =
+                        let x =
+                          (
+                            Ag_oj_run.read_string
                           ) p lb
                         in
                         incr len;
@@ -305,14 +309,14 @@ let read_bootstrap = (
                           done
                         with Yojson.End_of_tuple -> ()
                       );
-                      (x0, x1)
+                      (x0, x1, x2, x3)
                     with Yojson.End_of_tuple ->
-                      Ag_oj_run.missing_tuple_fields !len [ 0; 1 ]);
+                      Ag_oj_run.missing_tuple_fields !len [ 0; 1; 2; 3 ]);
                 ) p lb
               in
               Yojson.Safe.read_space p lb;
               Yojson.Safe.read_gt p lb;
-              `H x
+              `Node3 x
             | _ -> (
                 assert false
               )
@@ -322,21 +326,10 @@ let read_bootstrap = (
             fun s pos len ->
               if pos < 0 || len < 0 || pos + len > String.length s then
                 invalid_arg "out-of-bounds substring position or length";
-              try
-                if len = 1 && String.unsafe_get s pos = 'E' then (
-                  0
-                )
-                else (
-                  raise (Exit)
-                )
-              with Exit -> (
-                  Ag_oj_run.invalid_variant_tag (String.sub s pos len)
-                )
+              Ag_oj_run.invalid_variant_tag (String.sub s pos len)
           in
           let i = Yojson.Safe.map_string p f lb in
           match i with
-            | 0 ->
-              `E
             | _ -> (
                 assert false
               )
@@ -348,8 +341,17 @@ let read_bootstrap = (
               if pos < 0 || len < 0 || pos + len > String.length s then
                 invalid_arg "out-of-bounds substring position or length";
               try
-                if len = 1 && String.unsafe_get s pos = 'H' then (
-                  0
+                if len = 5 && String.unsafe_get s pos = 'N' && String.unsafe_get s (pos+1) = 'o' && String.unsafe_get s (pos+2) = 'd' && String.unsafe_get s (pos+3) = 'e' then (
+                  match String.unsafe_get s (pos+4) with
+                    | '2' -> (
+                        0
+                      )
+                    | '3' -> (
+                        1
+                      )
+                    | _ -> (
+                        raise (Exit)
+                      )
                 )
                 else (
                   raise (Exit)
@@ -385,7 +387,662 @@ let read_bootstrap = (
                       let x1 =
                         let x =
                           (
-                            read_heap
+                            Ag_oj_run.read_string
+                          ) p lb
+                        in
+                        incr len;
+                        Yojson.Safe.read_space p lb;
+                        Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                        x
+                      in
+                      let x2 =
+                        let x =
+                          (
+                            Ag_oj_run.read_string
+                          ) p lb
+                        in
+                        incr len;
+                        (try
+                          Yojson.Safe.read_space p lb;
+                          Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                        with Yojson.End_of_tuple -> end_of_tuple := true);
+                        x
+                      in
+                      if not !end_of_tuple then (
+                        try
+                          while true do
+                            Yojson.Safe.skip_json p lb;
+                            Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                          done
+                        with Yojson.End_of_tuple -> ()
+                      );
+                      (x0, x1, x2)
+                    with Yojson.End_of_tuple ->
+                      Ag_oj_run.missing_tuple_fields !len [ 0; 1; 2 ]);
+                ) p lb
+              in
+              Yojson.Safe.read_space p lb;
+              Yojson.Safe.read_rbr p lb;
+              `Node2 x
+            | 1 ->
+              Yojson.Safe.read_space p lb;
+              Yojson.Safe.read_comma p lb;
+              Yojson.Safe.read_space p lb;
+              let x = (
+                  fun p lb ->
+                    Yojson.Safe.read_space p lb;
+                    let std_tuple = Yojson.Safe.start_any_tuple p lb in
+                    let len = ref 0 in
+                    let end_of_tuple = ref false in
+                    (try
+                      let x0 =
+                        let x =
+                          (
+                            Ag_oj_run.read_string
+                          ) p lb
+                        in
+                        incr len;
+                        Yojson.Safe.read_space p lb;
+                        Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                        x
+                      in
+                      let x1 =
+                        let x =
+                          (
+                            Ag_oj_run.read_string
+                          ) p lb
+                        in
+                        incr len;
+                        Yojson.Safe.read_space p lb;
+                        Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                        x
+                      in
+                      let x2 =
+                        let x =
+                          (
+                            Ag_oj_run.read_string
+                          ) p lb
+                        in
+                        incr len;
+                        Yojson.Safe.read_space p lb;
+                        Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                        x
+                      in
+                      let x3 =
+                        let x =
+                          (
+                            Ag_oj_run.read_string
+                          ) p lb
+                        in
+                        incr len;
+                        (try
+                          Yojson.Safe.read_space p lb;
+                          Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                        with Yojson.End_of_tuple -> end_of_tuple := true);
+                        x
+                      in
+                      if not !end_of_tuple then (
+                        try
+                          while true do
+                            Yojson.Safe.skip_json p lb;
+                            Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                          done
+                        with Yojson.End_of_tuple -> ()
+                      );
+                      (x0, x1, x2, x3)
+                    with Yojson.End_of_tuple ->
+                      Ag_oj_run.missing_tuple_fields !len [ 0; 1; 2; 3 ]);
+                ) p lb
+              in
+              Yojson.Safe.read_space p lb;
+              Yojson.Safe.read_rbr p lb;
+              `Node3 x
+            | _ -> (
+                assert false
+              )
+        )
+)
+let node_of_string s =
+  read_node (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
+let write_digit = (
+  fun ob x ->
+    match x with
+      | `One x ->
+        Bi_outbuf.add_string ob "<\"One\":";
+        (
+          fun ob x ->
+            Bi_outbuf.add_char ob '(';
+            (let x, _ = x in
+            (
+              Yojson.Safe.write_string
+            ) ob x
+            );
+            Bi_outbuf.add_char ob ',';
+            (let _, x = x in
+            (
+              Yojson.Safe.write_string
+            ) ob x
+            );
+            Bi_outbuf.add_char ob ')';
+        ) ob x;
+        Bi_outbuf.add_char ob '>'
+      | `Two x ->
+        Bi_outbuf.add_string ob "<\"Two\":";
+        (
+          fun ob x ->
+            Bi_outbuf.add_char ob '(';
+            (let x, _, _ = x in
+            (
+              Yojson.Safe.write_string
+            ) ob x
+            );
+            Bi_outbuf.add_char ob ',';
+            (let _, x, _ = x in
+            (
+              Yojson.Safe.write_string
+            ) ob x
+            );
+            Bi_outbuf.add_char ob ',';
+            (let _, _, x = x in
+            (
+              Yojson.Safe.write_string
+            ) ob x
+            );
+            Bi_outbuf.add_char ob ')';
+        ) ob x;
+        Bi_outbuf.add_char ob '>'
+      | `Three x ->
+        Bi_outbuf.add_string ob "<\"Three\":";
+        (
+          fun ob x ->
+            Bi_outbuf.add_char ob '(';
+            (let x, _, _, _ = x in
+            (
+              Yojson.Safe.write_string
+            ) ob x
+            );
+            Bi_outbuf.add_char ob ',';
+            (let _, x, _, _ = x in
+            (
+              Yojson.Safe.write_string
+            ) ob x
+            );
+            Bi_outbuf.add_char ob ',';
+            (let _, _, x, _ = x in
+            (
+              Yojson.Safe.write_string
+            ) ob x
+            );
+            Bi_outbuf.add_char ob ',';
+            (let _, _, _, x = x in
+            (
+              Yojson.Safe.write_string
+            ) ob x
+            );
+            Bi_outbuf.add_char ob ')';
+        ) ob x;
+        Bi_outbuf.add_char ob '>'
+      | `Four x ->
+        Bi_outbuf.add_string ob "<\"Four\":";
+        (
+          fun ob x ->
+            Bi_outbuf.add_char ob '(';
+            (let x, _, _, _, _ = x in
+            (
+              Yojson.Safe.write_string
+            ) ob x
+            );
+            Bi_outbuf.add_char ob ',';
+            (let _, x, _, _, _ = x in
+            (
+              Yojson.Safe.write_string
+            ) ob x
+            );
+            Bi_outbuf.add_char ob ',';
+            (let _, _, x, _, _ = x in
+            (
+              Yojson.Safe.write_string
+            ) ob x
+            );
+            Bi_outbuf.add_char ob ',';
+            (let _, _, _, x, _ = x in
+            (
+              Yojson.Safe.write_string
+            ) ob x
+            );
+            Bi_outbuf.add_char ob ',';
+            (let _, _, _, _, x = x in
+            (
+              Yojson.Safe.write_string
+            ) ob x
+            );
+            Bi_outbuf.add_char ob ')';
+        ) ob x;
+        Bi_outbuf.add_char ob '>'
+)
+let string_of_digit ?(len = 1024) x =
+  let ob = Bi_outbuf.create len in
+  write_digit ob x;
+  Bi_outbuf.contents ob
+let read_digit = (
+  fun p lb ->
+    Yojson.Safe.read_space p lb;
+    match Yojson.Safe.start_any_variant p lb with
+      | `Edgy_bracket -> (
+          Yojson.Safe.read_space p lb;
+          let f =
+            fun s pos len ->
+              if pos < 0 || len < 0 || pos + len > String.length s then
+                invalid_arg "out-of-bounds substring position or length";
+              try
+                match len with
+                  | 3 -> (
+                      match String.unsafe_get s pos with
+                        | 'O' -> (
+                            if String.unsafe_get s (pos+1) = 'n' && String.unsafe_get s (pos+2) = 'e' then (
+                              0
+                            )
+                            else (
+                              raise (Exit)
+                            )
+                          )
+                        | 'T' -> (
+                            if String.unsafe_get s (pos+1) = 'w' && String.unsafe_get s (pos+2) = 'o' then (
+                              1
+                            )
+                            else (
+                              raise (Exit)
+                            )
+                          )
+                        | _ -> (
+                            raise (Exit)
+                          )
+                    )
+                  | 4 -> (
+                      if String.unsafe_get s pos = 'F' && String.unsafe_get s (pos+1) = 'o' && String.unsafe_get s (pos+2) = 'u' && String.unsafe_get s (pos+3) = 'r' then (
+                        3
+                      )
+                      else (
+                        raise (Exit)
+                      )
+                    )
+                  | 5 -> (
+                      if String.unsafe_get s pos = 'T' && String.unsafe_get s (pos+1) = 'h' && String.unsafe_get s (pos+2) = 'r' && String.unsafe_get s (pos+3) = 'e' && String.unsafe_get s (pos+4) = 'e' then (
+                        2
+                      )
+                      else (
+                        raise (Exit)
+                      )
+                    )
+                  | _ -> (
+                      raise (Exit)
+                    )
+              with Exit -> (
+                  Ag_oj_run.invalid_variant_tag (String.sub s pos len)
+                )
+          in
+          let i = Yojson.Safe.map_ident p f lb in
+          match i with
+            | 0 ->
+              Ag_oj_run.read_until_field_value p lb;
+              let x = (
+                  fun p lb ->
+                    Yojson.Safe.read_space p lb;
+                    let std_tuple = Yojson.Safe.start_any_tuple p lb in
+                    let len = ref 0 in
+                    let end_of_tuple = ref false in
+                    (try
+                      let x0 =
+                        let x =
+                          (
+                            Ag_oj_run.read_string
+                          ) p lb
+                        in
+                        incr len;
+                        Yojson.Safe.read_space p lb;
+                        Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                        x
+                      in
+                      let x1 =
+                        let x =
+                          (
+                            Ag_oj_run.read_string
+                          ) p lb
+                        in
+                        incr len;
+                        (try
+                          Yojson.Safe.read_space p lb;
+                          Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                        with Yojson.End_of_tuple -> end_of_tuple := true);
+                        x
+                      in
+                      if not !end_of_tuple then (
+                        try
+                          while true do
+                            Yojson.Safe.skip_json p lb;
+                            Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                          done
+                        with Yojson.End_of_tuple -> ()
+                      );
+                      (x0, x1)
+                    with Yojson.End_of_tuple ->
+                      Ag_oj_run.missing_tuple_fields !len [ 0; 1 ]);
+                ) p lb
+              in
+              Yojson.Safe.read_space p lb;
+              Yojson.Safe.read_gt p lb;
+              `One x
+            | 1 ->
+              Ag_oj_run.read_until_field_value p lb;
+              let x = (
+                  fun p lb ->
+                    Yojson.Safe.read_space p lb;
+                    let std_tuple = Yojson.Safe.start_any_tuple p lb in
+                    let len = ref 0 in
+                    let end_of_tuple = ref false in
+                    (try
+                      let x0 =
+                        let x =
+                          (
+                            Ag_oj_run.read_string
+                          ) p lb
+                        in
+                        incr len;
+                        Yojson.Safe.read_space p lb;
+                        Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                        x
+                      in
+                      let x1 =
+                        let x =
+                          (
+                            Ag_oj_run.read_string
+                          ) p lb
+                        in
+                        incr len;
+                        Yojson.Safe.read_space p lb;
+                        Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                        x
+                      in
+                      let x2 =
+                        let x =
+                          (
+                            Ag_oj_run.read_string
+                          ) p lb
+                        in
+                        incr len;
+                        (try
+                          Yojson.Safe.read_space p lb;
+                          Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                        with Yojson.End_of_tuple -> end_of_tuple := true);
+                        x
+                      in
+                      if not !end_of_tuple then (
+                        try
+                          while true do
+                            Yojson.Safe.skip_json p lb;
+                            Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                          done
+                        with Yojson.End_of_tuple -> ()
+                      );
+                      (x0, x1, x2)
+                    with Yojson.End_of_tuple ->
+                      Ag_oj_run.missing_tuple_fields !len [ 0; 1; 2 ]);
+                ) p lb
+              in
+              Yojson.Safe.read_space p lb;
+              Yojson.Safe.read_gt p lb;
+              `Two x
+            | 2 ->
+              Ag_oj_run.read_until_field_value p lb;
+              let x = (
+                  fun p lb ->
+                    Yojson.Safe.read_space p lb;
+                    let std_tuple = Yojson.Safe.start_any_tuple p lb in
+                    let len = ref 0 in
+                    let end_of_tuple = ref false in
+                    (try
+                      let x0 =
+                        let x =
+                          (
+                            Ag_oj_run.read_string
+                          ) p lb
+                        in
+                        incr len;
+                        Yojson.Safe.read_space p lb;
+                        Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                        x
+                      in
+                      let x1 =
+                        let x =
+                          (
+                            Ag_oj_run.read_string
+                          ) p lb
+                        in
+                        incr len;
+                        Yojson.Safe.read_space p lb;
+                        Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                        x
+                      in
+                      let x2 =
+                        let x =
+                          (
+                            Ag_oj_run.read_string
+                          ) p lb
+                        in
+                        incr len;
+                        Yojson.Safe.read_space p lb;
+                        Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                        x
+                      in
+                      let x3 =
+                        let x =
+                          (
+                            Ag_oj_run.read_string
+                          ) p lb
+                        in
+                        incr len;
+                        (try
+                          Yojson.Safe.read_space p lb;
+                          Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                        with Yojson.End_of_tuple -> end_of_tuple := true);
+                        x
+                      in
+                      if not !end_of_tuple then (
+                        try
+                          while true do
+                            Yojson.Safe.skip_json p lb;
+                            Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                          done
+                        with Yojson.End_of_tuple -> ()
+                      );
+                      (x0, x1, x2, x3)
+                    with Yojson.End_of_tuple ->
+                      Ag_oj_run.missing_tuple_fields !len [ 0; 1; 2; 3 ]);
+                ) p lb
+              in
+              Yojson.Safe.read_space p lb;
+              Yojson.Safe.read_gt p lb;
+              `Three x
+            | 3 ->
+              Ag_oj_run.read_until_field_value p lb;
+              let x = (
+                  fun p lb ->
+                    Yojson.Safe.read_space p lb;
+                    let std_tuple = Yojson.Safe.start_any_tuple p lb in
+                    let len = ref 0 in
+                    let end_of_tuple = ref false in
+                    (try
+                      let x0 =
+                        let x =
+                          (
+                            Ag_oj_run.read_string
+                          ) p lb
+                        in
+                        incr len;
+                        Yojson.Safe.read_space p lb;
+                        Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                        x
+                      in
+                      let x1 =
+                        let x =
+                          (
+                            Ag_oj_run.read_string
+                          ) p lb
+                        in
+                        incr len;
+                        Yojson.Safe.read_space p lb;
+                        Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                        x
+                      in
+                      let x2 =
+                        let x =
+                          (
+                            Ag_oj_run.read_string
+                          ) p lb
+                        in
+                        incr len;
+                        Yojson.Safe.read_space p lb;
+                        Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                        x
+                      in
+                      let x3 =
+                        let x =
+                          (
+                            Ag_oj_run.read_string
+                          ) p lb
+                        in
+                        incr len;
+                        Yojson.Safe.read_space p lb;
+                        Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                        x
+                      in
+                      let x4 =
+                        let x =
+                          (
+                            Ag_oj_run.read_string
+                          ) p lb
+                        in
+                        incr len;
+                        (try
+                          Yojson.Safe.read_space p lb;
+                          Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                        with Yojson.End_of_tuple -> end_of_tuple := true);
+                        x
+                      in
+                      if not !end_of_tuple then (
+                        try
+                          while true do
+                            Yojson.Safe.skip_json p lb;
+                            Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                          done
+                        with Yojson.End_of_tuple -> ()
+                      );
+                      (x0, x1, x2, x3, x4)
+                    with Yojson.End_of_tuple ->
+                      Ag_oj_run.missing_tuple_fields !len [ 0; 1; 2; 3; 4 ]);
+                ) p lb
+              in
+              Yojson.Safe.read_space p lb;
+              Yojson.Safe.read_gt p lb;
+              `Four x
+            | _ -> (
+                assert false
+              )
+        )
+      | `Double_quote -> (
+          let f =
+            fun s pos len ->
+              if pos < 0 || len < 0 || pos + len > String.length s then
+                invalid_arg "out-of-bounds substring position or length";
+              Ag_oj_run.invalid_variant_tag (String.sub s pos len)
+          in
+          let i = Yojson.Safe.map_string p f lb in
+          match i with
+            | _ -> (
+                assert false
+              )
+        )
+      | `Square_bracket -> (
+          Yojson.Safe.read_space p lb;
+          let f =
+            fun s pos len ->
+              if pos < 0 || len < 0 || pos + len > String.length s then
+                invalid_arg "out-of-bounds substring position or length";
+              try
+                match len with
+                  | 3 -> (
+                      match String.unsafe_get s pos with
+                        | 'O' -> (
+                            if String.unsafe_get s (pos+1) = 'n' && String.unsafe_get s (pos+2) = 'e' then (
+                              0
+                            )
+                            else (
+                              raise (Exit)
+                            )
+                          )
+                        | 'T' -> (
+                            if String.unsafe_get s (pos+1) = 'w' && String.unsafe_get s (pos+2) = 'o' then (
+                              1
+                            )
+                            else (
+                              raise (Exit)
+                            )
+                          )
+                        | _ -> (
+                            raise (Exit)
+                          )
+                    )
+                  | 4 -> (
+                      if String.unsafe_get s pos = 'F' && String.unsafe_get s (pos+1) = 'o' && String.unsafe_get s (pos+2) = 'u' && String.unsafe_get s (pos+3) = 'r' then (
+                        3
+                      )
+                      else (
+                        raise (Exit)
+                      )
+                    )
+                  | 5 -> (
+                      if String.unsafe_get s pos = 'T' && String.unsafe_get s (pos+1) = 'h' && String.unsafe_get s (pos+2) = 'r' && String.unsafe_get s (pos+3) = 'e' && String.unsafe_get s (pos+4) = 'e' then (
+                        2
+                      )
+                      else (
+                        raise (Exit)
+                      )
+                    )
+                  | _ -> (
+                      raise (Exit)
+                    )
+              with Exit -> (
+                  Ag_oj_run.invalid_variant_tag (String.sub s pos len)
+                )
+          in
+          let i = Yojson.Safe.map_ident p f lb in
+          match i with
+            | 0 ->
+              Yojson.Safe.read_space p lb;
+              Yojson.Safe.read_comma p lb;
+              Yojson.Safe.read_space p lb;
+              let x = (
+                  fun p lb ->
+                    Yojson.Safe.read_space p lb;
+                    let std_tuple = Yojson.Safe.start_any_tuple p lb in
+                    let len = ref 0 in
+                    let end_of_tuple = ref false in
+                    (try
+                      let x0 =
+                        let x =
+                          (
+                            Ag_oj_run.read_string
+                          ) p lb
+                        in
+                        incr len;
+                        Yojson.Safe.read_space p lb;
+                        Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                        x
+                      in
+                      let x1 =
+                        let x =
+                          (
+                            Ag_oj_run.read_string
                           ) p lb
                         in
                         incr len;
@@ -410,11 +1067,557 @@ let read_bootstrap = (
               in
               Yojson.Safe.read_space p lb;
               Yojson.Safe.read_rbr p lb;
-              `H x
+              `One x
+            | 1 ->
+              Yojson.Safe.read_space p lb;
+              Yojson.Safe.read_comma p lb;
+              Yojson.Safe.read_space p lb;
+              let x = (
+                  fun p lb ->
+                    Yojson.Safe.read_space p lb;
+                    let std_tuple = Yojson.Safe.start_any_tuple p lb in
+                    let len = ref 0 in
+                    let end_of_tuple = ref false in
+                    (try
+                      let x0 =
+                        let x =
+                          (
+                            Ag_oj_run.read_string
+                          ) p lb
+                        in
+                        incr len;
+                        Yojson.Safe.read_space p lb;
+                        Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                        x
+                      in
+                      let x1 =
+                        let x =
+                          (
+                            Ag_oj_run.read_string
+                          ) p lb
+                        in
+                        incr len;
+                        Yojson.Safe.read_space p lb;
+                        Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                        x
+                      in
+                      let x2 =
+                        let x =
+                          (
+                            Ag_oj_run.read_string
+                          ) p lb
+                        in
+                        incr len;
+                        (try
+                          Yojson.Safe.read_space p lb;
+                          Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                        with Yojson.End_of_tuple -> end_of_tuple := true);
+                        x
+                      in
+                      if not !end_of_tuple then (
+                        try
+                          while true do
+                            Yojson.Safe.skip_json p lb;
+                            Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                          done
+                        with Yojson.End_of_tuple -> ()
+                      );
+                      (x0, x1, x2)
+                    with Yojson.End_of_tuple ->
+                      Ag_oj_run.missing_tuple_fields !len [ 0; 1; 2 ]);
+                ) p lb
+              in
+              Yojson.Safe.read_space p lb;
+              Yojson.Safe.read_rbr p lb;
+              `Two x
+            | 2 ->
+              Yojson.Safe.read_space p lb;
+              Yojson.Safe.read_comma p lb;
+              Yojson.Safe.read_space p lb;
+              let x = (
+                  fun p lb ->
+                    Yojson.Safe.read_space p lb;
+                    let std_tuple = Yojson.Safe.start_any_tuple p lb in
+                    let len = ref 0 in
+                    let end_of_tuple = ref false in
+                    (try
+                      let x0 =
+                        let x =
+                          (
+                            Ag_oj_run.read_string
+                          ) p lb
+                        in
+                        incr len;
+                        Yojson.Safe.read_space p lb;
+                        Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                        x
+                      in
+                      let x1 =
+                        let x =
+                          (
+                            Ag_oj_run.read_string
+                          ) p lb
+                        in
+                        incr len;
+                        Yojson.Safe.read_space p lb;
+                        Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                        x
+                      in
+                      let x2 =
+                        let x =
+                          (
+                            Ag_oj_run.read_string
+                          ) p lb
+                        in
+                        incr len;
+                        Yojson.Safe.read_space p lb;
+                        Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                        x
+                      in
+                      let x3 =
+                        let x =
+                          (
+                            Ag_oj_run.read_string
+                          ) p lb
+                        in
+                        incr len;
+                        (try
+                          Yojson.Safe.read_space p lb;
+                          Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                        with Yojson.End_of_tuple -> end_of_tuple := true);
+                        x
+                      in
+                      if not !end_of_tuple then (
+                        try
+                          while true do
+                            Yojson.Safe.skip_json p lb;
+                            Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                          done
+                        with Yojson.End_of_tuple -> ()
+                      );
+                      (x0, x1, x2, x3)
+                    with Yojson.End_of_tuple ->
+                      Ag_oj_run.missing_tuple_fields !len [ 0; 1; 2; 3 ]);
+                ) p lb
+              in
+              Yojson.Safe.read_space p lb;
+              Yojson.Safe.read_rbr p lb;
+              `Three x
+            | 3 ->
+              Yojson.Safe.read_space p lb;
+              Yojson.Safe.read_comma p lb;
+              Yojson.Safe.read_space p lb;
+              let x = (
+                  fun p lb ->
+                    Yojson.Safe.read_space p lb;
+                    let std_tuple = Yojson.Safe.start_any_tuple p lb in
+                    let len = ref 0 in
+                    let end_of_tuple = ref false in
+                    (try
+                      let x0 =
+                        let x =
+                          (
+                            Ag_oj_run.read_string
+                          ) p lb
+                        in
+                        incr len;
+                        Yojson.Safe.read_space p lb;
+                        Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                        x
+                      in
+                      let x1 =
+                        let x =
+                          (
+                            Ag_oj_run.read_string
+                          ) p lb
+                        in
+                        incr len;
+                        Yojson.Safe.read_space p lb;
+                        Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                        x
+                      in
+                      let x2 =
+                        let x =
+                          (
+                            Ag_oj_run.read_string
+                          ) p lb
+                        in
+                        incr len;
+                        Yojson.Safe.read_space p lb;
+                        Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                        x
+                      in
+                      let x3 =
+                        let x =
+                          (
+                            Ag_oj_run.read_string
+                          ) p lb
+                        in
+                        incr len;
+                        Yojson.Safe.read_space p lb;
+                        Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                        x
+                      in
+                      let x4 =
+                        let x =
+                          (
+                            Ag_oj_run.read_string
+                          ) p lb
+                        in
+                        incr len;
+                        (try
+                          Yojson.Safe.read_space p lb;
+                          Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                        with Yojson.End_of_tuple -> end_of_tuple := true);
+                        x
+                      in
+                      if not !end_of_tuple then (
+                        try
+                          while true do
+                            Yojson.Safe.skip_json p lb;
+                            Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                          done
+                        with Yojson.End_of_tuple -> ()
+                      );
+                      (x0, x1, x2, x3, x4)
+                    with Yojson.End_of_tuple ->
+                      Ag_oj_run.missing_tuple_fields !len [ 0; 1; 2; 3; 4 ]);
+                ) p lb
+              in
+              Yojson.Safe.read_space p lb;
+              Yojson.Safe.read_rbr p lb;
+              `Four x
             | _ -> (
                 assert false
               )
         )
 )
-let bootstrap_of_string s =
-  read_bootstrap (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
+let digit_of_string s =
+  read_digit (Yojson.Safe.init_lexer ()) (Lexing.from_string s)
+let write_fg = (
+  fun ob x ->
+    match x with
+      | `Nil -> Bi_outbuf.add_string ob "<\"Nil\">"
+      | `Single x ->
+        Bi_outbuf.add_string ob "<\"Single\":";
+        (
+          Yojson.Safe.write_string
+        ) ob x;
+        Bi_outbuf.add_char ob '>'
+      | `Deep x ->
+        Bi_outbuf.add_string ob "<\"Deep\":";
+        (
+          fun ob x ->
+            Bi_outbuf.add_char ob '(';
+            (let x, _, _, _ = x in
+            (
+              Yojson.Safe.write_string
+            ) ob x
+            );
+            Bi_outbuf.add_char ob ',';
+            (let _, x, _, _ = x in
+            (
+              write_digit
+            ) ob x
+            );
+            Bi_outbuf.add_char ob ',';
+            (let _, _, x, _ = x in
+            (
+              Yojson.Safe.write_string
+            ) ob x
+            );
+            Bi_outbuf.add_char ob ',';
+            (let _, _, _, x = x in
+            (
+              write_digit
+            ) ob x
+            );
+            Bi_outbuf.add_char ob ')';
+        ) ob x;
+        Bi_outbuf.add_char ob '>'
+)
+let string_of_fg ?(len = 1024) x =
+  let ob = Bi_outbuf.create len in
+  write_fg ob x;
+  Bi_outbuf.contents ob
+let read_fg = (
+  fun p lb ->
+    Yojson.Safe.read_space p lb;
+    match Yojson.Safe.start_any_variant p lb with
+      | `Edgy_bracket -> (
+          Yojson.Safe.read_space p lb;
+          let f =
+            fun s pos len ->
+              if pos < 0 || len < 0 || pos + len > String.length s then
+                invalid_arg "out-of-bounds substring position or length";
+              try
+                match len with
+                  | 3 -> (
+                      if String.unsafe_get s pos = 'N' && String.unsafe_get s (pos+1) = 'i' && String.unsafe_get s (pos+2) = 'l' then (
+                        0
+                      )
+                      else (
+                        raise (Exit)
+                      )
+                    )
+                  | 4 -> (
+                      if String.unsafe_get s pos = 'D' && String.unsafe_get s (pos+1) = 'e' && String.unsafe_get s (pos+2) = 'e' && String.unsafe_get s (pos+3) = 'p' then (
+                        2
+                      )
+                      else (
+                        raise (Exit)
+                      )
+                    )
+                  | 6 -> (
+                      if String.unsafe_get s pos = 'S' && String.unsafe_get s (pos+1) = 'i' && String.unsafe_get s (pos+2) = 'n' && String.unsafe_get s (pos+3) = 'g' && String.unsafe_get s (pos+4) = 'l' && String.unsafe_get s (pos+5) = 'e' then (
+                        1
+                      )
+                      else (
+                        raise (Exit)
+                      )
+                    )
+                  | _ -> (
+                      raise (Exit)
+                    )
+              with Exit -> (
+                  Ag_oj_run.invalid_variant_tag (String.sub s pos len)
+                )
+          in
+          let i = Yojson.Safe.map_ident p f lb in
+          match i with
+            | 0 ->
+              Yojson.Safe.read_space p lb;
+              Yojson.Safe.read_gt p lb;
+              `Nil
+            | 1 ->
+              Ag_oj_run.read_until_field_value p lb;
+              let x = (
+                  Ag_oj_run.read_string
+                ) p lb
+              in
+              Yojson.Safe.read_space p lb;
+              Yojson.Safe.read_gt p lb;
+              `Single x
+            | 2 ->
+              Ag_oj_run.read_until_field_value p lb;
+              let x = (
+                  fun p lb ->
+                    Yojson.Safe.read_space p lb;
+                    let std_tuple = Yojson.Safe.start_any_tuple p lb in
+                    let len = ref 0 in
+                    let end_of_tuple = ref false in
+                    (try
+                      let x0 =
+                        let x =
+                          (
+                            Ag_oj_run.read_string
+                          ) p lb
+                        in
+                        incr len;
+                        Yojson.Safe.read_space p lb;
+                        Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                        x
+                      in
+                      let x1 =
+                        let x =
+                          (
+                            read_digit
+                          ) p lb
+                        in
+                        incr len;
+                        Yojson.Safe.read_space p lb;
+                        Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                        x
+                      in
+                      let x2 =
+                        let x =
+                          (
+                            Ag_oj_run.read_string
+                          ) p lb
+                        in
+                        incr len;
+                        Yojson.Safe.read_space p lb;
+                        Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                        x
+                      in
+                      let x3 =
+                        let x =
+                          (
+                            read_digit
+                          ) p lb
+                        in
+                        incr len;
+                        (try
+                          Yojson.Safe.read_space p lb;
+                          Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                        with Yojson.End_of_tuple -> end_of_tuple := true);
+                        x
+                      in
+                      if not !end_of_tuple then (
+                        try
+                          while true do
+                            Yojson.Safe.skip_json p lb;
+                            Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                          done
+                        with Yojson.End_of_tuple -> ()
+                      );
+                      (x0, x1, x2, x3)
+                    with Yojson.End_of_tuple ->
+                      Ag_oj_run.missing_tuple_fields !len [ 0; 1; 2; 3 ]);
+                ) p lb
+              in
+              Yojson.Safe.read_space p lb;
+              Yojson.Safe.read_gt p lb;
+              `Deep x
+            | _ -> (
+                assert false
+              )
+        )
+      | `Double_quote -> (
+          let f =
+            fun s pos len ->
+              if pos < 0 || len < 0 || pos + len > String.length s then
+                invalid_arg "out-of-bounds substring position or length";
+              try
+                if len = 3 && String.unsafe_get s pos = 'N' && String.unsafe_get s (pos+1) = 'i' && String.unsafe_get s (pos+2) = 'l' then (
+                  0
+                )
+                else (
+                  raise (Exit)
+                )
+              with Exit -> (
+                  Ag_oj_run.invalid_variant_tag (String.sub s pos len)
+                )
+          in
+          let i = Yojson.Safe.map_string p f lb in
+          match i with
+            | 0 ->
+              `Nil
+            | _ -> (
+                assert false
+              )
+        )
+      | `Square_bracket -> (
+          Yojson.Safe.read_space p lb;
+          let f =
+            fun s pos len ->
+              if pos < 0 || len < 0 || pos + len > String.length s then
+                invalid_arg "out-of-bounds substring position or length";
+              try
+                match len with
+                  | 4 -> (
+                      if String.unsafe_get s pos = 'D' && String.unsafe_get s (pos+1) = 'e' && String.unsafe_get s (pos+2) = 'e' && String.unsafe_get s (pos+3) = 'p' then (
+                        1
+                      )
+                      else (
+                        raise (Exit)
+                      )
+                    )
+                  | 6 -> (
+                      if String.unsafe_get s pos = 'S' && String.unsafe_get s (pos+1) = 'i' && String.unsafe_get s (pos+2) = 'n' && String.unsafe_get s (pos+3) = 'g' && String.unsafe_get s (pos+4) = 'l' && String.unsafe_get s (pos+5) = 'e' then (
+                        0
+                      )
+                      else (
+                        raise (Exit)
+                      )
+                    )
+                  | _ -> (
+                      raise (Exit)
+                    )
+              with Exit -> (
+                  Ag_oj_run.invalid_variant_tag (String.sub s pos len)
+                )
+          in
+          let i = Yojson.Safe.map_ident p f lb in
+          match i with
+            | 0 ->
+              Yojson.Safe.read_space p lb;
+              Yojson.Safe.read_comma p lb;
+              Yojson.Safe.read_space p lb;
+              let x = (
+                  Ag_oj_run.read_string
+                ) p lb
+              in
+              Yojson.Safe.read_space p lb;
+              Yojson.Safe.read_rbr p lb;
+              `Single x
+            | 1 ->
+              Yojson.Safe.read_space p lb;
+              Yojson.Safe.read_comma p lb;
+              Yojson.Safe.read_space p lb;
+              let x = (
+                  fun p lb ->
+                    Yojson.Safe.read_space p lb;
+                    let std_tuple = Yojson.Safe.start_any_tuple p lb in
+                    let len = ref 0 in
+                    let end_of_tuple = ref false in
+                    (try
+                      let x0 =
+                        let x =
+                          (
+                            Ag_oj_run.read_string
+                          ) p lb
+                        in
+                        incr len;
+                        Yojson.Safe.read_space p lb;
+                        Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                        x
+                      in
+                      let x1 =
+                        let x =
+                          (
+                            read_digit
+                          ) p lb
+                        in
+                        incr len;
+                        Yojson.Safe.read_space p lb;
+                        Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                        x
+                      in
+                      let x2 =
+                        let x =
+                          (
+                            Ag_oj_run.read_string
+                          ) p lb
+                        in
+                        incr len;
+                        Yojson.Safe.read_space p lb;
+                        Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                        x
+                      in
+                      let x3 =
+                        let x =
+                          (
+                            read_digit
+                          ) p lb
+                        in
+                        incr len;
+                        (try
+                          Yojson.Safe.read_space p lb;
+                          Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                        with Yojson.End_of_tuple -> end_of_tuple := true);
+                        x
+                      in
+                      if not !end_of_tuple then (
+                        try
+                          while true do
+                            Yojson.Safe.skip_json p lb;
+                            Yojson.Safe.read_tuple_sep2 p std_tuple lb;
+                          done
+                        with Yojson.End_of_tuple -> ()
+                      );
+                      (x0, x1, x2, x3)
+                    with Yojson.End_of_tuple ->
+                      Ag_oj_run.missing_tuple_fields !len [ 0; 1; 2; 3 ]);
+                ) p lb
+              in
+              Yojson.Safe.read_space p lb;
+              Yojson.Safe.read_rbr p lb;
+              `Deep x
+            | _ -> (
+                assert false
+              )
+        )
+)
+let fg_of_string s =
+  read_fg (Yojson.Safe.init_lexer ()) (Lexing.from_string s)

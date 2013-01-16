@@ -5,9 +5,9 @@ type rlist = Yuki_t.rlist
 
 type node = Yuki_t.node
 
-type heap = Yuki_t.heap
+type digit = Yuki_t.digit
 
-type bootstrap = Yuki_t.bootstrap
+type fg = Yuki_t.fg
 
 val write_rlist :
   Bi_outbuf.t -> rlist -> unit
@@ -49,43 +49,43 @@ val node_of_string :
   string -> node
   (** Deserialize JSON data of type {!node}. *)
 
-val write_heap :
-  Bi_outbuf.t -> heap -> unit
-  (** Output a JSON value of type {!heap}. *)
+val write_digit :
+  Bi_outbuf.t -> digit -> unit
+  (** Output a JSON value of type {!digit}. *)
 
-val string_of_heap :
-  ?len:int -> heap -> string
-  (** Serialize a value of type {!heap}
+val string_of_digit :
+  ?len:int -> digit -> string
+  (** Serialize a value of type {!digit}
       into a JSON string.
       @param len specifies the initial length
                  of the buffer used internally.
                  Default: 1024. *)
 
-val read_heap :
-  Yojson.Safe.lexer_state -> Lexing.lexbuf -> heap
-  (** Input JSON data of type {!heap}. *)
+val read_digit :
+  Yojson.Safe.lexer_state -> Lexing.lexbuf -> digit
+  (** Input JSON data of type {!digit}. *)
 
-val heap_of_string :
-  string -> heap
-  (** Deserialize JSON data of type {!heap}. *)
+val digit_of_string :
+  string -> digit
+  (** Deserialize JSON data of type {!digit}. *)
 
-val write_bootstrap :
-  Bi_outbuf.t -> bootstrap -> unit
-  (** Output a JSON value of type {!bootstrap}. *)
+val write_fg :
+  Bi_outbuf.t -> fg -> unit
+  (** Output a JSON value of type {!fg}. *)
 
-val string_of_bootstrap :
-  ?len:int -> bootstrap -> string
-  (** Serialize a value of type {!bootstrap}
+val string_of_fg :
+  ?len:int -> fg -> string
+  (** Serialize a value of type {!fg}
       into a JSON string.
       @param len specifies the initial length
                  of the buffer used internally.
                  Default: 1024. *)
 
-val read_bootstrap :
-  Yojson.Safe.lexer_state -> Lexing.lexbuf -> bootstrap
-  (** Input JSON data of type {!bootstrap}. *)
+val read_fg :
+  Yojson.Safe.lexer_state -> Lexing.lexbuf -> fg
+  (** Input JSON data of type {!fg}. *)
 
-val bootstrap_of_string :
-  string -> bootstrap
-  (** Deserialize JSON data of type {!bootstrap}. *)
+val fg_of_string :
+  string -> fg
+  (** Deserialize JSON data of type {!fg}. *)
 

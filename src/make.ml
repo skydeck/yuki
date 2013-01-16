@@ -19,3 +19,9 @@ module type Ord = sig
   include Elem
   val compare : t -> t -> int
 end
+
+module type Monoid = sig
+  include Stringable
+  val zero : t
+  val combine : t -> t -> t
+end
