@@ -1,21 +1,29 @@
 open Lwt
 open Riak
-open Yuki_j
+open Bin_prot
+open Utils
+open Std
 
 exception Empty
 
+module Bootstrap = struct
+  type t = E | H of (string * string list) with bin_io
+  let of_string x = bin_read_t ~pos_ref:(ref 0) (Bigstring.of_string x)
+  let to_string x = Bigstring.to_string (bin_dump bin_writer_t x)
+end
+
 module Make(Conn:Make.Conn)(Elem:Make.Ord) = struct
   module BootstrappedElem = struct
-      type t = E | H of (Elem.t * heap)
+      type t = E | H of (Elem.t * string list)
       let compare x y = match x, y with
         | H (x, _), H (y, _) -> Elem.compare x y
         | _ -> raise Not_found
-      let of_string x = match bootstrap_of_string x with
-        | `H (x, p) -> H (Elem.of_string x, p)
-        | `E -> E
-      let to_string x = string_of_bootstrap (match x with
-        | H (x, p) -> `H (Elem.to_string x, p)
-        | E -> `E)
+      let of_string x = match Bootstrap.of_string x with
+        | Bootstrap.H (x, p) -> H (Elem.of_string x, p)
+        | Bootstrap.E -> E
+      let to_string x = Bootstrap.to_string (match x with
+        | H (x, p) -> Bootstrap.H (Elem.to_string x, p)
+        | E -> Bootstrap.E)
       let bucket = Elem.bucket
   end
 

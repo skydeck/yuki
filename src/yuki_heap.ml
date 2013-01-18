@@ -1,14 +1,22 @@
 open Lwt
 open Riak
-open Yuki_j
+open Bin_prot
+open Utils
+open Std
 
 exception Empty
+
+module Node = struct
+  type t = int * string * string list with bin_io
+  let of_string x = bin_read_t ~pos_ref:(ref 0) (Bigstring.of_string x)
+  let to_string x = Bigstring.to_string (bin_dump bin_writer_t x)
+end
 
 module Make(Conn:Make.Conn)(Elem:Make.Ord) = struct
   module Client = Client.Make(Conn)(struct
     type t = int * Elem.t * Elem.t list
-    let of_string x = let (r, x, xs) = node_of_string x in (r, Elem.of_string x, List.map Elem.of_string xs)
-    let to_string (r, x, xs) = string_of_node (r, Elem.to_string x, List.map Elem.to_string xs)
+    let of_string x = let (r, x, xs) = Node.of_string x in (r, Elem.of_string x, List.map Elem.of_string xs)
+    let to_string (r, x, xs) = Node.to_string (r, Elem.to_string x, List.map Elem.to_string xs)
     let bucket = Elem.bucket
   end)
 

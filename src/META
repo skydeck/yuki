@@ -1,8 +1,8 @@
 # OASIS_START
-# DO NOT EDIT (digest: 49c293d0316d0e7751f0df215b8bdfb0)
+# DO NOT EDIT (digest: 1158f8d0992e358b4bde33c1c509ca27)
 version = "0.1"
 description = "Functional data structures for Riak"
-requires = "lwt lwt.unix lwt.syntax riak atdgen"
+requires = "lwt lwt.unix lwt.syntax bin_prot bin_prot.syntax riak"
 archive(byte) = "yuki.cma"
 archive(byte, plugin) = "yuki.cma"
 archive(native) = "yuki.cmxa"

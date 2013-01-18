@@ -1,12 +1,14 @@
 open Lwt
-open Yuki_j
+open Bin_prot
+open Utils
+open Std
 
 module RandomAccessList(Conn:Make.Conn)(Elem:Make.Elem) = struct
   module Impl = Yuki_rlist.Make(Conn)(Elem)
   module Client = Client.Make(Conn)(struct
-    type t = rlist
-    let of_string x = rlist_of_string x
-    let to_string x = string_of_rlist x
+    type t = (int * string) list with bin_io
+    let of_string x = bin_read_t ~pos_ref:(ref 0) (Bigstring.of_string x)
+    let to_string x = Bigstring.to_string (bin_dump bin_writer_t x)
     let bucket = Elem.bucket
   end)
 
@@ -49,9 +51,9 @@ module Imperative = struct
   module RandomAccessList(Conn:Make.Conn)(Elem:Make.Elem) = struct
     module Impl = Yuki_rlist.Make(Conn)(Elem)
     module Client = Client.Make(Conn)(struct
-      type t = rlist
-      let of_string x = rlist_of_string x
-      let to_string x = string_of_rlist x
+      type t = (int * string) list with bin_io
+      let of_string x = bin_read_t ~pos_ref:(ref 0) (Bigstring.of_string x)
+      let to_string x = Bigstring.to_string (bin_dump bin_writer_t x)
       let bucket = Elem.bucket
     end)
 
