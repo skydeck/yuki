@@ -6,57 +6,57 @@ open Std
 
 exception Empty
 
-module Bootstrap = struct
-  type t = E | H of (string * string list) with bin_io
-  let of_string x = bin_read_t ~pos_ref:(ref 0) (Bigstring.of_string x)
-  let to_string x = Bigstring.to_string (bin_dump bin_writer_t x)
-end
-
 module Make(Conn:Make.Conn)(Elem:Make.Ord) = struct
+  module Bootstrap = Make_binable(struct
+    module Binable = struct
+      type t = (string * string list) option with bin_io
+    end
+
+    type t = (Elem.t * string list) option
+    let to_binable = function Some (x, p) -> Some (Elem.to_string x, p) | _ -> None
+    let of_binable = function Some (x, p) -> Some (Elem.of_string x, p) | _ -> None
+  end)
+
   module BootstrappedElem = struct
-      type t = E | H of (Elem.t * string list)
+      type t = (Elem.t * string list) option
       let compare x y = match x, y with
-        | H (x, _), H (y, _) -> Elem.compare x y
+        | Some (x, _), Some (y, _) -> Elem.compare x y
         | _ -> raise Not_found
-      let of_string x = match Bootstrap.of_string x with
-        | Bootstrap.H (x, p) -> H (Elem.of_string x, p)
-        | Bootstrap.E -> E
-      let to_string x = Bootstrap.to_string (match x with
-        | H (x, p) -> Bootstrap.H (Elem.to_string x, p)
-        | E -> Bootstrap.E)
+      let of_string x = Bootstrap.bin_read_t ~pos_ref:(ref 0) (Bigstring.of_string x)
+      let to_string x = Bigstring.to_string (bin_dump Bootstrap.bin_writer_t x)
       let bucket = Elem.bucket
   end
 
   module PrimH = Yuki_heap.Make(Conn)(BootstrappedElem)
   open BootstrappedElem (* expose E and H constructors *)
 
-  let empty = E
-  let is_empty = function E -> true | _ -> false
+  let empty = None
+  let is_empty = function None -> true | _ -> false
 
   let merge h1 h2 = match h1, h2 with
-    | E, h -> return h
-    | h, E -> return h
-    | H (x, p1), H (y, p2) ->
+    | None, h -> return h
+    | h, None -> return h
+    | Some (x, p1), Some (y, p2) ->
         if Elem.compare x y <= 0 then
           lwt p = PrimH.insert h2 p1 in
-          return (H (x, p))
+          return (Some (x, p))
         else
           lwt p = PrimH.insert h1 p2 in
-          return (H (y, p))
+          return (Some (y, p))
 
-  let insert x h = merge (H (x, PrimH.empty)) h
+  let insert x h = merge (Some (x, PrimH.empty)) h
 
   let find_min = function
-    | E -> raise Empty
-    | H (x, _) -> return x
+    | None -> raise Empty
+    | Some (x, _) -> return x
 
   let delete_min = function
-    | E -> raise Empty
-    | H (x, p) ->
-        if PrimH.is_empty p then return (x, E)
+    | None -> raise Empty
+    | Some (x, p) ->
+        if PrimH.is_empty p then return (x, None)
         else match_lwt PrimH.delete_min p with
-          | (H (y, p1), p2) ->
+          | (Some (y, p1), p2) ->
               lwt p' = PrimH.merge p1 p2 in
-              return (x, H (y, p'))
+              return (x, Some (y, p'))
           | _ -> assert false
 end
