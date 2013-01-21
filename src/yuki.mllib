@@ -1,8 +1,11 @@
 # OASIS_START
-# DO NOT EDIT (digest: 3b5e070eeb21d08168151d7d082b137d)
+# DO NOT EDIT (digest: f8385b3368c528c06d47a797bebe3d6e)
 Yuki
 Make
 Client
 Bigstring
 Yuki_rlist
+Yuki_queue
+Yuki_heap
+Yuki_bootstrap
 # OASIS_STOP
