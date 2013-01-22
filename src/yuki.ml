@@ -1,4 +1,5 @@
 open Lwt
+open Core
 open Bin_prot
 open Utils
 open Std
@@ -33,13 +34,13 @@ end
 
 module Queue(Conn:Make.Conn)(Elem:Make.Elem) = struct
   module Impl = Yuki_queue.Make(Conn)(Elem)
-  (*module Client = Impl.Client
+  module Client = Impl.Client
 
   let init () = Client.put Impl.empty []
 
   let snoc head x = Client.write head (Impl.snoc x)
   let head head = Client.read head Impl.head
-  let pop head = Client.write' head Impl.tail*)
+  let pop head = Client.write' head Impl.pop
 end
 
 module Heap(Conn:Make.Conn)(Elem:Make.Ord) = struct

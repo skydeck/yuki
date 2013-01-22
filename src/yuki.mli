@@ -20,11 +20,11 @@ module RandomAccessList(Conn:Make.Conn)(Elem:Make.Elem) : sig
 end
 
 module Queue(Conn:Make.Conn)(Elem:Make.Elem) : sig
-  (*val init : unit -> string Lwt.t
+  val init : unit -> string Lwt.t
 
   val snoc : string -> Elem.t -> string Lwt.t
   val head : string -> Elem.t Lwt.t
-  val pop : string -> (Elem.t * string) Lwt.t*)
+  val pop : string -> (Elem.t * string) Lwt.t
 end
 
 module Heap(Conn:Make.Conn)(Elem:Make.Ord) : sig

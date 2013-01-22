@@ -1,5 +1,6 @@
 open Lwt
 open Riak
+open Core
 open Bin_prot
 open Utils
 open Std
