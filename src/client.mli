@@ -1,4 +1,17 @@
 open Riak
+open Bin_prot
+open Type_class
+
+module Make1(Conn:Make.Conn)(Elem:Make.Bin1) : sig
+  type 'a t = {
+    key : riak_key;
+    value : 'a Elem.t;
+    links : riak_key list;
+  }
+
+  val get : 'a reader -> riak_key -> 'a t Lwt.t
+  val put : 'a writer -> ?key:riak_key -> ?ops:riak_put_option list -> 'a Elem.t -> riak_key list -> riak_key Lwt.t
+end
 
 module Make(Conn:Make.Conn)(Elem:Make.Elem) : sig
   type t = {

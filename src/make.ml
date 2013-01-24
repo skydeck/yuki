@@ -14,3 +14,8 @@ module type Ord = sig
   include Elem
   val compare : t -> t -> int
 end
+
+module type Bin1 = sig
+  include Binable.S1
+  val bucket : string
+end
